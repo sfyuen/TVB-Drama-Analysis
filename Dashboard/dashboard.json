@@ -1,0 +1,241 @@
+{
+  "title": "Analysis of TVB Drama (2010 to 2023)",
+  "version": "2.4",
+  "settings": {
+    "pagenumber": 0,
+    "editable": true,
+    "fullscreenEnabled": false,
+    "parameters": {
+      "neodash_drama_name": [],
+      "neodash_drama_name_display": [],
+      "neodash_aaa": "",
+      "neodash_search_type": "Drama",
+      "neodash_search_type_display": "Drama",
+      "neodash_a": "回歸",
+      "neodash_a_display": "回歸",
+      "neodash_aa": [],
+      "neodash_aa_display": [],
+      "neodash_role": [],
+      "neodash_role_display": []
+    },
+    "theme": "light"
+  },
+  "pages": [
+    {
+      "title": "Main Page",
+      "reports": [
+        {
+          "id": "8615e25a-fc1c-46b0-a38b-b98eb389c3d6",
+          "title": "Genre Visualization (Truncated)",
+          "query": "MATCH (g:Genre)<-[gn]-(d:Drama)\nwhere (($neodash_drama_name =[]) or d.name in $neodash_drama_name)\nwith g,gn,d, COUNT(gn) as c\nRETURN  g,gn,d order by c desc limit 250",
+          "width": 6,
+          "height": 4,
+          "x": 0,
+          "y": 4,
+          "type": "graph",
+          "selection": {
+            "Genre": "name",
+            "HAS_GENRE": "(label)",
+            "Drama": "name"
+          },
+          "settings": {
+            "frozen": false,
+            "nodePositions": {},
+            "fullscreenEnabled": true,
+            "nodeColorScheme": "nivo"
+          },
+          "schema": [
+            [
+              "Genre",
+              "name"
+            ],
+            [
+              "HAS_GENRE"
+            ],
+            [
+              "Drama",
+              "production_end",
+              "name",
+              "id",
+              "production_start",
+              "episodes"
+            ]
+          ]
+        },
+        {
+          "id": "c31a0130-4677-41bc-a1af-af52ab7f6f17",
+          "title": "Count by Production Year",
+          "query": "MATCH (d:Drama)\nwhere (($neodash_drama_name =[]) or d.name in $neodash_drama_name)\nreturn d.production_end as production_year, count(*) as count\norder by production_year asc\n\n",
+          "width": 6,
+          "height": 4,
+          "x": 18,
+          "y": 4,
+          "type": "bar",
+          "selection": {
+            "index": "production_year",
+            "value": "count",
+            "key": "(none)"
+          },
+          "settings": {
+            "xTickRotationAngle": 45
+          },
+          "schema": []
+        },
+        {
+          "id": "bfc379c7-365a-4d7e-b544-1a3991bc00de",
+          "title": "Count by Episodes",
+          "query": "MATCH (d:Drama)\nwhere (($neodash_drama_name =[]) or d.name in $neodash_drama_name)\nreturn d.episodes as Episodes, count(*) as Count",
+          "width": 6,
+          "height": 4,
+          "x": 12,
+          "y": 4,
+          "type": "pie",
+          "selection": {
+            "index": "Episodes",
+            "value": "Count",
+            "key": "(none)"
+          },
+          "settings": {},
+          "schema": []
+        },
+        {
+          "id": "62623da7-f908-4e2f-abc5-ba0a6d7a298b",
+          "title": "Count by Genres",
+          "query": "MATCH path=(d:Drama)-->(g:Genre)\nwhere (($neodash_drama_name =[]) or d.name in $neodash_drama_name)\nreturn g.name as Genre, count(*) as Count order by Count desc\n\n",
+          "width": 6,
+          "height": 4,
+          "x": 6,
+          "y": 4,
+          "type": "bar",
+          "selection": {
+            "index": "Genre",
+            "value": "Count",
+            "key": "(none)"
+          },
+          "settings": {
+            "fullscreenEnabled": true
+          },
+          "schema": []
+        },
+        {
+          "id": "08a14c65-dc51-44b5-8f7d-16e1602d89d2",
+          "title": "Count by Participation",
+          "query": "MATCH (p:Person)-[r]->(d:Drama)\nwhere (($neodash_drama_name =[]) or d.name in $neodash_drama_name) and (($neodash_role =[]) or type(r) in $neodash_role )\nreturn p.name as Person, TYPE(r) as Role, count(*) as Count\norder by Count desc, Role asc\n\n",
+          "width": 6,
+          "height": 4,
+          "x": 18,
+          "y": 0,
+          "type": "table",
+          "selection": {},
+          "settings": {}
+        },
+        {
+          "id": "362066b3-2e9e-4595-a745-b7c379635d73",
+          "title": "Filter by Drama Names",
+          "query": "MATCH (n:`Drama`) \nWHERE toLower(toString(n.`name`)) CONTAINS toLower($input) \nRETURN DISTINCT n.`name` as value,  n.`name` as display ORDER BY size(toString(value)) ASC LIMIT 5",
+          "width": 6,
+          "height": 4,
+          "x": 0,
+          "y": 0,
+          "type": "select",
+          "selection": {},
+          "settings": {
+            "type": "Node Property",
+            "ignoreNonDefinedParams": false,
+            "refreshButtonEnabled": false,
+            "autoSelectFirstValue": false,
+            "entityType": "Drama",
+            "propertyType": "name",
+            "propertyTypeDisplay": "name",
+            "parameterName": "neodash_drama_name",
+            "multiSelector": true,
+            "multiSelectLimit": 10
+          },
+          "schema": []
+        },
+        {
+          "id": "97d1752e-063d-41f2-9a6e-16d5dd2aac5d",
+          "title": "Person Visualization (Truncated)",
+          "query": "MATCH (p:Person)-[r]->(d:Drama)\nwhere (($neodash_drama_name =[]) or d.name in $neodash_drama_name) and (($neodash_role =[]) or type(r) in $neodash_role )\nwith p,r,d, COUNT(r) as c\nRETURN  p,r,d order by c desc limit 250\n\n\n",
+          "width": 6,
+          "height": 4,
+          "x": 12,
+          "y": 0,
+          "type": "graph",
+          "selection": {
+            "Person": "name",
+            "ACTED_IN": "(label)",
+            "Drama": "name",
+            "IS_EXECUTIVE_PRODUCER_OF": "(label)",
+            "IS_PRODUCER_OF": "(label)",
+            "IS_SUPERVISOR_OF": "(label)",
+            "IS_WRITER_OF": "(label)",
+            "IS_PRODUCTION_ASSISTANT_OF": "(label)"
+          },
+          "settings": {
+            "fullscreenEnabled": true
+          },
+          "schema": [
+            [
+              "Person",
+              "name"
+            ],
+            [
+              "ACTED_IN",
+              "roles"
+            ],
+            [
+              "Drama",
+              "production_end",
+              "name",
+              "id",
+              "production_start",
+              "episodes"
+            ],
+            [
+              "IS_EXECUTIVE_PRODUCER_OF"
+            ],
+            [
+              "IS_PRODUCER_OF"
+            ],
+            [
+              "IS_SUPERVISOR_OF"
+            ],
+            [
+              "IS_WRITER_OF"
+            ],
+            [
+              "IS_PRODUCTION_ASSISTANT_OF"
+            ]
+          ]
+        },
+        {
+          "id": "cbcf1955-9d9a-4bbd-b1d8-00c1c09591d0",
+          "title": "Filter by Roles",
+          "query": "MATCH (p:Person)-[r]->(d:Drama) \nWHERE toLower(toString(TYPE(r))) CONTAINS toLower($input) \nRETURN DISTINCT TYPE(r)  as value,  TYPE(r)  as display ORDER BY size(toString(value)) ASC LIMIT 10\n\n\n",
+          "width": 6,
+          "height": 4,
+          "x": 6,
+          "y": 0,
+          "type": "select",
+          "selection": {},
+          "settings": {
+            "type": "Custom Query",
+            "entityType": "Role",
+            "parameterName": "neodash_role",
+            "suggestionLimit": 10,
+            "multiSelectLimit": 10,
+            "multiSelector": true
+          },
+          "schema": []
+        }
+      ]
+    }
+  ],
+  "parameters": {},
+  "extensions": {
+    "active": true,
+    "activeReducers": []
+  },
+  "uuid": "6d61d61f-04d0-47cb-aeba-1315878fdd4c"
+}
